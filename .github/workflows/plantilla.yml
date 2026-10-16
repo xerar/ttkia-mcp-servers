@@ -86,3 +86,17 @@ jobs:
           fi
       - name: Imagen Docker
         run: docker build -t prueba .
+
+  resultado:
+    # La única comprobación que hay que exigir en la protección de main:
+    # falla si falla cualquiera de las anteriores, también las de cada ejemplo.
+    name: Resultado
+    if: always()
+    needs: [datos, listar, probar]
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "datos=${{ needs.datos.result }} listar=${{ needs.listar.result }} probar=${{ needs.probar.result }}"
+          test "${{ needs.datos.result }}" = success
+          test "${{ needs.listar.result }}" = success
+          test "${{ needs.probar.result }}" = success
