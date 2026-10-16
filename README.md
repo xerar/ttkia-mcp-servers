@@ -5,7 +5,9 @@ Cómo conectar a TTKIA herramientas nuevas mediante MCP, por dos caminos:
 1. **[Dar de alta un servidor de terceros](docs/terceros.md)** que ya existe (GitHub, Microsoft Learn…), desde tu perfil.
 2. **[Escribir tu propio servidor](docs/servidor-propio.md)** a partir de tus scripts, alojarlo donde tengas sitio y darlo de alta igual.
 
-Este repositorio trae la guía y una [plantilla](plantilla/) de servidor lista para copiar, probada con el SDK `mcp` 2.1.1 (el que usa TTKIA). Si algo no va, mira [problemas habituales](docs/problemas.md) o abre una incidencia.
+Este repositorio trae la guía, una [plantilla](plantilla/) de servidor lista para copiar, probada con el SDK `mcp` 2.1.1 (el que usa TTKIA), y los [ejemplos](ejemplos/) que aportan los compañeros. Si algo no va, mira [problemas habituales](docs/problemas.md) o abre una incidencia.
+
+¿Tienes un servidor que le puede servir a otros? [Así se aporta](CONTRIBUTING.md).
 
 ## Qué es MCP
 
@@ -62,15 +64,20 @@ Aun así, la regla para el usuario es sencilla: **no uses un servidor externo en
 │   ├── servidor-propio.md   caso 2: escribir, publicar y dar de alta el tuyo
 │   ├── problemas.md         problemas habituales
 │   └── img/
-└── plantilla/               servidor de ejemplo listo para copiar
-    ├── src/main.py
-    ├── probar.py            prueba el servidor como lo haría TTKIA
-    ├── requirements.txt
-    ├── Dockerfile
-    ├── docker-compose.yml   servidor + Caddy (HTTPS automático)
-    ├── Caddyfile
-    └── .env.example
+├── plantilla/               servidor de ejemplo listo para copiar
+│   ├── src/main.py
+│   ├── probar.py            prueba el servidor como lo haría TTKIA
+│   ├── prueba.json          la llamada que hace la revisión automática
+│   ├── requirements.txt
+│   ├── Dockerfile
+│   ├── docker-compose.yml   servidor + Caddy (HTTPS automático)
+│   ├── Caddyfile
+│   └── .env.example
+├── ejemplos/                servidores aportados por compañeros
+└── CONTRIBUTING.md          cómo aportar un ejemplo y qué no puede ir nunca
 ```
+
+Cada cambio pasa una revisión automática (secretos, direcciones internas, y que la plantilla y cada ejemplo arranquen y respondan como TTKIA espera) y la aprobación de un revisor.
 
 ## Licencia
 

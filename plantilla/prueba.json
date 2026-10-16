@@ -1,0 +1,4 @@
+{
+  "herramienta": "cert_expiry",
+  "argumentos": {"host": "github.com"}
+}

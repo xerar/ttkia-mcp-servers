@@ -1,35 +1,88 @@
-# Arranca la plantilla y la prueba como lo haría TTKIA en cada cambio
-name: Plantilla
+# Revisa cada cambio antes de que llegue a main:
+#  1. que no haya secretos ni direcciones internas;
+#  2. que la plantilla y cada ejemplo tengan la estructura esperada,
+#     arranquen y respondan como TTKIA espera.
+name: Revisión
 
 on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
-  probar:
+  datos:
+    name: Secretos y direcciones internas
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Secretos (gitleaks, todo el historial)
+        run: |
+          curl -sSL https://github.com/gitleaks/gitleaks/releases/download/v8.21.2/gitleaks_8.21.2_linux_x64.tar.gz | tar xz gitleaks
+          ./gitleaks detect --source . --redact -v
+      - name: Direcciones IP internas o privadas
+        run: python3 .github/scripts/revisar_datos.py
+
+  listar:
+    name: Servidores a probar
+    runs-on: ubuntu-latest
+    outputs:
+      dirs: ${{ steps.l.outputs.dirs }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: l
+        run: |
+          dirs=$( { echo plantilla; ls -d ejemplos/*/ 2>/dev/null | sed 's#/$##'; } | jq -R . | jq -cs . )
+          echo "dirs=$dirs" >> "$GITHUB_OUTPUT"
+          echo "$dirs"
+
+  probar:
+    name: Probar ${{ matrix.dir }}
+    needs: listar
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        dir: ${{ fromJSON(needs.listar.outputs.dirs) }}
     defaults:
       run:
-        working-directory: plantilla
+        working-directory: ${{ matrix.dir }}
     env:
       MCP_AUTH_TOKEN: token-de-prueba
+      PORT: "8000"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - name: Estructura
+        run: |
+          falta=0
+          for f in README.md requirements.txt Dockerfile .env.example src/main.py; do
+            [ -f "$f" ] || { echo "Falta $f"; falta=1; }
+          done
+          exit $falta
       - name: Dependencias
         run: pip install -r requirements.txt
       - name: Arrancar el servidor
         run: |
           python src/main.py > servidor.log 2>&1 &
           for i in $(seq 1 20); do curl -fsS http://localhost:8000/health && exit 0; sleep 1; done
-          cat servidor.log; exit 1
+          echo "No responde en /health:"; cat servidor.log; exit 1
       - name: Sin token debe responder 401
         run: |
           test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:8000/mcp)" = "401"
       - name: Probar como TTKIA
         run: |
-          python probar.py http://localhost:8000/mcp "$MCP_AUTH_TOKEN" cert_expiry '{"host": "github.com"}'
+          probar="$GITHUB_WORKSPACE/plantilla/probar.py"
+          if [ -f prueba.json ]; then
+            python "$probar" http://localhost:8000/mcp "$MCP_AUTH_TOKEN" \
+              "$(jq -r .herramienta prueba.json)" "$(jq -c .argumentos prueba.json)"
+          else
+            python "$probar" http://localhost:8000/mcp "$MCP_AUTH_TOKEN"
+          fi
       - name: Imagen Docker
-        run: docker build -t mcp-certs .
+        run: docker build -t prueba .

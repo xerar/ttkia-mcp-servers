@@ -49,4 +49,9 @@ if __name__ == "__main__":
     url, token = sys.argv[1], sys.argv[2]
     tool = sys.argv[3] if len(sys.argv) > 3 else None
     args = json.loads(sys.argv[4]) if len(sys.argv) > 4 else {}
-    sys.exit(asyncio.run(main(url, token, tool, args)))
+    try:
+        sys.exit(asyncio.run(main(url, token, tool, args)))
+    except Exception as e:  # el SDK envuelve los fallos en grupos de excepciones
+        while isinstance(e, BaseExceptionGroup) and e.exceptions:
+            e = e.exceptions[0]
+        sys.exit(f"No se pudo hablar con {url}: {e}")
