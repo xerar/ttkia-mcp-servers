@@ -1,0 +1,20 @@
+services:
+  mcp:
+    build: .
+    restart: unless-stopped
+    environment:
+      MCP_AUTH_TOKEN: ${MCP_AUTH_TOKEN}
+    # Sin ports: solo se llega al servidor a través de Caddy, por HTTPS
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"     # Let's Encrypt valida el certificado por aquí
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+
+volumes:
+  caddy_data:

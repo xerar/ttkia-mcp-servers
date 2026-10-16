@@ -1,0 +1,4 @@
+# Cambia el nombre por el tuyo: un nombre DNS que apunte a esta máquina
+mcp.tudominio.com {
+    reverse_proxy mcp:8000
+}

@@ -1,0 +1,35 @@
+# Arranca la plantilla y la prueba como lo haría TTKIA en cada cambio
+name: Plantilla
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  probar:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: plantilla
+    env:
+      MCP_AUTH_TOKEN: token-de-prueba
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Dependencias
+        run: pip install -r requirements.txt
+      - name: Arrancar el servidor
+        run: |
+          python src/main.py > servidor.log 2>&1 &
+          for i in $(seq 1 20); do curl -fsS http://localhost:8000/health && exit 0; sleep 1; done
+          cat servidor.log; exit 1
+      - name: Sin token debe responder 401
+        run: |
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:8000/mcp)" = "401"
+      - name: Probar como TTKIA
+        run: |
+          python probar.py http://localhost:8000/mcp "$MCP_AUTH_TOKEN" cert_expiry '{"host": "github.com"}'
+      - name: Imagen Docker
+        run: docker build -t mcp-certs .
