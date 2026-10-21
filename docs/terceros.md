@@ -1,21 +1,28 @@
 # Caso 1: añadir un servidor MCP de terceros
 
-Cualquier usuario con el permiso «External MCP» puede dar de alta desde su perfil un servidor MCP público por HTTPS, sin token o con token Bearer, y elegir cuáles de sus herramientas de solo lectura usa TTKIA.
+Cualquier usuario con el permiso «External MCP» puede dar de alta desde su perfil un servidor MCP público por HTTPS (sin credenciales, con token Bearer o con inicio de sesión) y elegir cuáles de sus herramientas de solo lectura usa TTKIA.
+
+> **Próxima versión de TTKIA.** El inicio de sesión (botón **Sign in**, para Notion o Atlassian) y las citas que enseñan la llamada exacta llegan con la próxima versión. Hasta entonces, en el perfil solo están **Test** y el token.
 
 ## Antes de empezar
 
 - **Permiso.** Pídeselo a un administrador de TTKIA. Sin él, la sección «External MCP servers» no aparece en tu perfil.
 - **URL del servidor.** La del endpoint MCP del proveedor (streamable HTTP), no la de su web.
-- **Token, si lo pide.** Que sea de solo lectura y con el alcance más pequeño posible. TTKIA ya bloquea las herramientas que escriben, pero un token que no puede escribir es la segunda barrera.
+- **Cómo se identifica.** Mira en la documentación del proveedor qué pide:
+  - Nada (Microsoft Learn): solo la URL.
+  - Un token (GitHub): que sea de solo lectura y con el alcance más pequeño posible. TTKIA ya bloquea las herramientas que escriben, pero un token que no puede escribir es la segunda barrera.
+  - Inicio de sesión en su página, OAuth (Notion): no hay token que copiar. Sigue [Servidores con inicio de sesión](inicio-de-sesion.md).
 
-## Paso a paso
+## Paso a paso (sin credenciales o con token)
+
+Para los de inicio de sesión, el paso a paso está en [Servidores con inicio de sesión](inicio-de-sesion.md): cambia el paso 3 (**Sign in** en vez de **Test**).
 
 1. Abre tu perfil y baja hasta **External MCP servers**, debajo de «MCP tools».
 2. Pulsa **+ Add server** y escribe un nombre corto, la URL y, si hace falta, el token. El token se guarda cifrado y nunca vuelve al navegador.
 3. Pulsa **Test**. TTKIA se conecta, lee lo que publica el servidor y te enseña sus herramientas. Las que no son de solo lectura salen deshabilitadas con el motivo.
 4. Marca solo las herramientas que vayas a usar. Menos herramientas significa mejores elecciones del modelo.
 5. Pulsa **Add**. El servidor queda en estado «active» y entra en juego desde la siguiente pregunta.
-6. Haz una pregunta que lo necesite y comprueba en las fuentes de la respuesta que se ha usado su herramienta (`x_<nombre>__<herramienta>`).
+6. Haz una pregunta que lo necesite. Los datos que vengan de sus herramientas salen citados en verde: al pulsar la cita se abre la llamada exacta (`x_<nombre>__<herramienta>`), con lo que se envió y lo que devolvió.
 
 ![Alta de GitHub tras pulsar Test: las de solo lectura se marcan; las que escriben salen bloqueadas](img/alta-github.png)
 
@@ -66,8 +73,9 @@ El más sencillo para empezar: público, sin token, 3 herramientas, todas de sol
 | Microsoft Learn | `https://learn.microsoft.com/api/mcp` | Ninguna | Sí, probado |
 | GitHub | `https://api.githubcopilot.com/mcp/` | Token Bearer | Sí, probado |
 | ThousandEyes | `https://api.thousandeyes.com/mcp` | Token Bearer | Debería; falta probarlo con una cuenta |
-| Atlassian Rovo (Jira, Confluence) | `https://mcp.atlassian.com/v1/mcp` | Basic (correo + token) | No: falta admitir Basic |
+| Notion | `https://mcp.notion.com/mcp` | Inicio de sesión (OAuth) | Sí, probado ([cómo](inicio-de-sesion.md#ejemplo-notion)) |
+| Atlassian Rovo (Jira, Confluence) | `https://mcp.atlassian.com/v1/mcp/authv2` | Inicio de sesión (OAuth) | Debería; falta probarlo |
 | PagerDuty | — | `Token <clave>` | No: falta admitir ese esquema |
-| Gmail, Google Drive, Notion | — | OAuth | No: falta el inicio de sesión OAuth desde el perfil |
+| Gmail, Google Drive, Microsoft 365 | — | OAuth sin registro dinámico | No: exigen registrar antes una aplicación en su consola |
 | Uno que no declara anotaciones | — | — | No: no se puede saber qué herramientas son de solo lectura |
 | Uno en una dirección interna o de VPN | — | — | No: solo se admiten direcciones públicas |

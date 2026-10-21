@@ -7,7 +7,7 @@ Si tienes scripts que quieres que use TTKIA, los conviertes en un servidor MCP c
 Para TTKIA tu servidor es un servidor externo más, así que se le aplican las mismas reglas:
 
 - **HTTPS público en el 443, con certificado válido.** No se admiten direcciones privadas, internas o de VPN: un servidor en tu portátil o en una máquina de la red interna no sirve.
-- **Token Bearer.** El que configures en el servidor y pongas al darlo de alta.
+- **Token Bearer.** El que configures en el servidor y pongas al darlo de alta. TTKIA también admite [inicio de sesión](inicio-de-sesion.md#qué-tiene-que-ofrecer-el-servidor) (OAuth), pero para un servidor propio no compensa montarlo: el token basta.
 - **Herramientas de solo lectura** (`read_only_hint=True`). Las demás no se pueden activar.
 - **Respuesta en menos de 30 s** y como mucho 20 herramientas.
 

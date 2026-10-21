@@ -2,7 +2,7 @@
 
 Cómo conectar a TTKIA herramientas nuevas mediante MCP, por dos caminos:
 
-1. **[Dar de alta un servidor de terceros](docs/terceros.md)** que ya existe (GitHub, Microsoft Learn…), desde tu perfil.
+1. **[Dar de alta un servidor de terceros](docs/terceros.md)** que ya existe (GitHub, Microsoft Learn, Notion…), desde tu perfil. Los que piden iniciar sesión en su página, como Notion, están en **[Servidores con inicio de sesión](docs/inicio-de-sesion.md)**.
 2. **[Escribir tu propio servidor](docs/servidor-propio.md)** a partir de tus scripts, alojarlo donde tengas sitio y darlo de alta igual.
 
 Este repositorio trae la guía, una [plantilla](plantilla/) de servidor lista para copiar, probada con el SDK `mcp` 2.1.1 (el que usa TTKIA), y los [ejemplos](ejemplos/) que aportan los compañeros. Si algo no va, mira [problemas habituales](docs/problemas.md) o abre una incidencia.
@@ -30,7 +30,7 @@ En cada pregunta, TTKIA:
 1. **Descubre** lo que publica cada servidor (instrucciones y herramientas) y lo vuelve a leer periódicamente.
 2. **Planifica** qué servidores necesita, entre los que tienes activos.
 3. **Elige** las herramientas y sus argumentos, servidor a servidor, y las ejecuta. Los servidores externos van primero.
-4. **Responde** con los resultados, citando de qué herramienta sale cada dato.
+4. **Responde** con los resultados y cita de qué llamada sale cada dato. La cita se pulsa y enseña la llamada exacta: lo que se envió al servidor y lo que devolvió.
 
 Hay dos tipos de servidores:
 
@@ -41,13 +41,15 @@ Hay dos tipos de servidores:
 
 ## Qué admite TTKIA de un servidor externo
 
+> El inicio de sesión en la página del proveedor llega con la próxima versión de TTKIA.
+
 Un servidor externo, sea de un proveedor o tuyo, está fuera del control de TTKIA: lo que se le envía sale de Telefónica Tech y lo que devuelve no está revisado. Por eso:
 
 | Regla | Qué significa |
 | --- | --- |
 | Solo lectura | Solo se pueden activar las herramientas que el servidor declara de solo lectura (`read_only_hint=True`). Las que escriben salen bloqueadas. |
 | HTTPS público | Dirección `https://` en el puerto 443. No se admiten direcciones internas ni privadas. |
-| Token Bearer | Sin token o con token Bearer. Los servidores que solo admiten inicio de sesión en el navegador (OAuth: Gmail, Google Drive, Notion…) todavía no se pueden conectar. |
+| Credenciales | Sin credenciales, con token Bearer o con [inicio de sesión](docs/inicio-de-sesion.md) en la página del proveedor (OAuth con registro dinámico, como Notion). Los que exigen registrar antes una aplicación en su consola (Google, Microsoft 365) no se pueden conectar. |
 | No ven tus sistemas | Lo que TTKIA ha consultado en sistemas internos durante esa respuesta no se le pasa al servidor externo. |
 | Si cambia, se para | Si el servidor cambia sus herramientas o instrucciones, deja de usarse hasta que lo revises y lo apruebes de nuevo. |
 | Límites | 5 servidores por usuario, 20 herramientas por servidor y 30 s por llamada. |
@@ -61,6 +63,7 @@ Aun así, la regla para el usuario es sencilla: **no uses un servidor externo en
 .
 ├── docs/
 │   ├── terceros.md          caso 1: servidores de terceros (GitHub, Microsoft Learn)
+│   ├── inicio-de-sesion.md  servidores con inicio de sesión (OAuth): Notion
 │   ├── servidor-propio.md   caso 2: escribir, publicar y dar de alta el tuyo
 │   ├── problemas.md         problemas habituales
 │   └── img/
